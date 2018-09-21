@@ -1,0 +1,18 @@
+{
+  "name": "keyano",
+  "main": "./lib/keyano",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "keywords": [
+  ],
+  "activationCommands": {
+    "atom-workspace": "keyano:toggle"
+  },
+  "repository": "https://github.com/jomik/keyano-atom",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle keyano-atom",
+        "command": "keyano-atom:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "keyano-atom",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "keyano-atom:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
