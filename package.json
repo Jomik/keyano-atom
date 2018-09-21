@@ -1,18 +1,33 @@
 {
   "name": "keyano",
-  "main": "./lib/keyano",
+  "main": "./lib/index",
   "version": "0.0.0",
   "description": "A short description of your package",
-  "keywords": [
-  ],
-  "activationCommands": {
-    "atom-workspace": "keyano:toggle"
-  },
+  "keywords": [],
   "repository": "https://github.com/jomik/keyano-atom",
   "license": "MIT",
+  "scripts": {
+    "link": "apm link --dev --name keyano",
+    "unlink": "apm unlink --dev keyano"
+  },
+  "atomTranspilers": [
+    {
+      "transpiler": "atom-ts-transpiler",
+      "glob": "{!(node_modules)/**/,}*.ts?(x)"
+    }
+  ],
   "engines": {
-    "atom": ">=1.0.0 <2.0.0"
+    "atom": "^1.28.0"
   },
   "dependencies": {
+    "atom-ts-transpiler": "^1.5.2",
+    "typescript": "^2.9.2"
+  },
+  "devDependencies": {
+    "@types/atom": "^1.28.0",
+    "prettier": "^1.14.3",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-plugin-prettier": "^2.0.0"
   }
 }
