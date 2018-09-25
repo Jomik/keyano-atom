@@ -8,7 +8,8 @@
   "license": "MIT",
   "scripts": {
     "link": "apm link --dev --name keyano",
-    "unlink": "apm unlink --dev keyano"
+    "unlink": "apm unlink --dev keyano",
+    "test": "atom --test ./spec/**/*.ts"
   },
   "atomTranspilers": [
     {
@@ -16,6 +17,7 @@
       "glob": "{!(node_modules)/**/,}*.ts?(x)"
     }
   ],
+  "atomTestRunner": "./node_modules/atom-ts-spec-runner/runner.js",
   "engines": {
     "atom": "^1.28.0"
   },
@@ -32,7 +34,12 @@
   },
   "devDependencies": {
     "@types/atom": "^1.28.0",
+    "@types/chai": "^4.1.5",
+    "@types/mocha": "^5.2.5",
+    "atom-ts-spec-runner": "^1.1.1",
+    "chai": "^4.1.2",
     "prettier": "^1.14.3",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-plugin-prettier": "^2.0.0"
