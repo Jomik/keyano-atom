@@ -3,5 +3,7 @@
   "extends": ["tslint:recommended", "tslint-config-prettier"],
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
-  "rules": {}
+  "rules": {
+    "arrow-parens": "always"
+  }
 }

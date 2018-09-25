@@ -1,24 +1,37 @@
-import { CompositeDisposable, TextEditor } from "atom";
-import { KeyanoState } from "./keyano";
+import {
+  CompositeDisposable,
+  TextEditor,
+  CommandEvent,
+  TextEditorElement
+} from "atom";
+import { wordSelector } from "./selectors";
+import { selectNext, selectPrevious } from "./motions";
 
-export const disposables = new CompositeDisposable();
+export let disposables = new CompositeDisposable();
 
-const keyanoStates: { [id: number]: KeyanoState } = {};
-type State = {};
-
-export function activate(state: State) {
-  console.log("Activated Keyano");
+export function activate() {
   disposables.add(
     atom.workspace.observeTextEditors((editor: TextEditor) => {
-      keyanoStates[editor.id] = new KeyanoState(editor);
+      atom.views.getView(editor).classList.add("keyano");
+    }),
+    atom.commands.add("atom-text-editor", {
+      "keyano:select-next-word": (_: CommandEvent<TextEditorElement>) => {
+        const editor = atom.workspace.getActiveTextEditor();
+        if (editor !== undefined) {
+          selectNext(editor, wordSelector);
+        }
+      },
+      "keyano:select-previous-word": (_: CommandEvent<TextEditorElement>) => {
+        const editor = atom.workspace.getActiveTextEditor();
+        if (editor !== undefined) {
+          selectPrevious(editor, wordSelector);
+        }
+      }
     })
   );
 }
 
 export function deactivate() {
   disposables.dispose();
-}
-
-export function serialize(): String {
-  return "{}";
+  disposables = new CompositeDisposable();
 }

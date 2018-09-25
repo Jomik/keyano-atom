@@ -19,6 +19,13 @@
   "engines": {
     "atom": "^1.28.0"
   },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
   "dependencies": {
     "atom-ts-transpiler": "^1.5.2",
     "typescript": "^2.9.2"
