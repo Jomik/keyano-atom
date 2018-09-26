@@ -10,22 +10,19 @@ describe("motions", () => {
       it("should select word after char", async () => {
         const editor = testTextEditor("Lorem ip[s]um dolor sit amet");
         M.selectNext(editor, S.wordSelector);
-        const expected = testTextEditor("Lorem ipsum [dolor] sit amet");
-        assertEqualTextEditors(editor, expected);
+        assertEqualTextEditors(editor, "Lorem ipsum [dolor] sit amet");
       });
 
       it("should select word after word", async () => {
         const editor = testTextEditor("Lorem [ipsum] dolor sit amet");
         M.selectNext(editor, S.wordSelector);
-        const expected = testTextEditor("Lorem ipsum [dolor] sit amet");
-        assertEqualTextEditors(editor, expected);
+        assertEqualTextEditors(editor, "Lorem ipsum [dolor] sit amet");
       });
 
       it("should select word on next line", async () => {
         const editor = testTextEditor("Lorem ipsum [dolor] \nsit amet");
         M.selectNext(editor, S.wordSelector);
-        const expected = testTextEditor("Lorem ipsum dolor \n[sit] amet");
-        assertEqualTextEditors(editor, expected);
+        assertEqualTextEditors(editor, "Lorem ipsum dolor \n[sit] amet");
       });
     });
   });

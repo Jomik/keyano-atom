@@ -47,16 +47,11 @@ export function testTextEditor(text: string): TextEditor {
   return t;
 }
 
-function getTextEditorState(editor: TextEditor) {
-  return {
-    text: editor.getText(),
-    selections: editor.getSelectedBufferRanges()
-  };
-}
-
-export function assertEqualTextEditors(
-  actual: TextEditor,
-  expected: TextEditor
-) {
-  assert.deepEqual(getTextEditorState(actual), getTextEditorState(expected));
+export function assertEqualTextEditors(actual: TextEditor, expected: string) {
+  const parsedText = expected.replace("[", "").replace("]", "");
+  assert.strictEqual(actual.getText(), parsedText);
+  assert.sameDeepMembers(
+    actual.getSelectedBufferRanges(),
+    parseBracketRanges(expected)
+  );
 }

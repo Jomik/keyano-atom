@@ -61,15 +61,18 @@ hijklmn]opqrstuvw`;
 
   describe("assertEqualTextEditors", () => {
     it("should be equal", () => {
-      const t1 = testTextEditor("[abcdefg]");
-      const t2 = testTextEditor("[abcdefg]");
-      assertEqualTextEditors(t1, t2);
+      const t = testTextEditor("[abcdefg]");
+      assertEqualTextEditors(t, "[abcdefg]");
     });
 
-    it("should not be equal", () => {
-      const t1 = testTextEditor("[abcdefg]");
-      const t2 = testTextEditor("[abc]defg");
-      assert.throws(() => assertEqualTextEditors(t1, t2));
+    it("should not be equal on different selections", () => {
+      const t = testTextEditor("[abcdefg]");
+      assert.throws(() => assertEqualTextEditors(t, "[abc]defg"));
+    });
+
+    it("should not be equal on different text", () => {
+      const t = testTextEditor("[abcdefg]");
+      assert.throws(() => assertEqualTextEditors(t, "[abcdeff]"));
     });
   });
 });
