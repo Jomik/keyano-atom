@@ -64,7 +64,6 @@ function withEditorContext(
 function toggleKeyanoBindings() {
   const editor = atom.workspace.getActiveTextEditor();
   if (editor !== undefined) {
-    // @ts-ignore
-    editor.element.classList.toggle("keyano");
+    atom.views.getView(editor).classList.toggle("keyano");
   }
 }

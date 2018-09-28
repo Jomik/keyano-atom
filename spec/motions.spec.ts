@@ -1,10 +1,5 @@
 import { assert } from "chai";
-import {
-  testTextEditor,
-  assertEqualTextEditors,
-  packagePath,
-  destroyAllTextEditors
-} from "./helpers";
+import { testTextEditor, assertEqualTextEditors, packagePath } from "./helpers";
 import { Command as C } from "../lib";
 
 describe("motions", () => {

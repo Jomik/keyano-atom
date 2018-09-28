@@ -44,7 +44,7 @@ export async function testTextEditor(
   const ranges = parseBracketRanges(text);
   t.setSelectedScreenRanges(ranges);
   for (const command of commands) {
-    await atom.commands.dispatch((<any>t).element, command);
+    await atom.commands.dispatch(atom.views.getView(t), command);
   }
   return t;
 }
