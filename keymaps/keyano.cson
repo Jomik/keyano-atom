@@ -1,6 +1,7 @@
 "atom-text-editor.keyano":
   "æ": "keyano:select-next"
   "j": "keyano:select-previous"
-  "w": "keyano:set-context-word"
+  "w": "keyano:set-selector-word"
+  "q": "keyano:set-selector-line"
 "atom-text-editor":
   "alt-escape": "keyano:toggle"

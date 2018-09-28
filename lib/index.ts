@@ -4,13 +4,14 @@ import {
   CommandEvent,
   TextEditorElement
 } from "atom";
-import { wordSelector, Selector } from "./selectors";
+import { wordSelector, lineSelector, Selector } from "./selectors";
 import { selectNext, selectPrevious } from "./motions";
 
 export let disposables = new CompositeDisposable();
 
 export enum Command {
   Word = "keyano:set-selector-word",
+  Line = "keyano:set-selector-line",
   next = "keyano:select-next",
   prev = "keyano:select-previous"
 }
@@ -25,6 +26,7 @@ export function activate() {
     }),
     atom.commands.add("atom-text-editor", {
       [Command.Word]: setSelector(wordSelector),
+      [Command.Line]: setSelector(lineSelector),
       [Command.next]: withEditorContext(selectNext),
       [Command.prev]: withEditorContext(selectPrevious),
       "keyano:toggle": toggleKeyanoBindings

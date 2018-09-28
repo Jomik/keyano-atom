@@ -52,3 +52,29 @@ export const wordSelector: Selector = {
     return word;
   }
 };
+
+export const lineSelector: Selector = {
+  matches: (range: Range, buffer: TextBuffer) => {
+    return (
+      range.start.row === range.end.row &&
+      range.start.column === 0 &&
+      range.end.column === buffer.lineLengthForRow(range.start.row)
+    );
+  },
+  next: (from: Point, buffer: TextBuffer) => {
+    const row = from.row + 1;
+    if (row > buffer.getLastRow()) {
+      return;
+    }
+    const length = buffer.lineLengthForRow(row);
+    return new Range([row, 0], [row, length]);
+  },
+  previous: (from: Point, buffer: TextBuffer) => {
+    const row = from.row - 1;
+    if (row < 0) {
+      return;
+    }
+    const length = buffer.lineLengthForRow(row);
+    return new Range([row, 0], [row, length]);
+  }
+};
