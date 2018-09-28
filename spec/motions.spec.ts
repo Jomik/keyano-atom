@@ -64,4 +64,69 @@ describe("motions", () => {
       });
     });
   });
+  describe("line", () => {
+    describe("selectNext", () => {
+      it("should select line after char", async () => {
+        const editor = await testTextEditor(
+          `Lorem ipsum dolor sit amet, con[s]ectetur adipiscing elit. Pellentesque mauris
+sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`,
+          [C.Line, C.next]
+        );
+        assertEqualTextEditors(
+          editor,
+          `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris
+[sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque]
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`
+        );
+      });
+
+      it("should select line after line", async () => {
+        const editor = await testTextEditor(
+          `[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris]
+sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`,
+          [C.Line, C.next]
+        );
+        assertEqualTextEditors(
+          editor,
+          `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris
+[sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque]
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`
+        );
+      });
+    });
+
+    describe("selectPrevious", () => {
+      it("should select line before char", async () => {
+        const editor = await testTextEditor(
+          `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris
+sem, ultrices imperdiet pretium non, pellente[s]que ut purus. Orci varius natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`,
+          [C.Line, C.prev]
+        );
+        assertEqualTextEditors(
+          editor,
+          `[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris]
+sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`
+        );
+      });
+
+      it("should select line before line", async () => {
+        const editor = await testTextEditor(
+          `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris
+[sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque]
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`,
+          [C.Line, C.prev]
+        );
+        assertEqualTextEditors(
+          editor,
+          `[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque mauris]
+sem, ultrices imperdiet pretium non, pellentesque ut purus. Orci varius natoque
+penatibus et magnis dis parturient montes, nascetur ridiculus mus.`
+        );
+      });
+    });
+  });
 });
