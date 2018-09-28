@@ -3,5 +3,6 @@
   "j": "keyano:select-previous"
   "w": "keyano:set-selector-word"
   "q": "keyano:set-selector-line"
+  "e": "keyano:set-selector-parentheses"
 "atom-text-editor":
   "alt-escape": "keyano:toggle"
