@@ -1,13 +1,9 @@
 import { TextEditor, Range } from "atom";
 import { assert } from "chai";
 import { join } from "path";
+import { Command } from "../lib";
 
 export const packagePath = join(__dirname, "..");
-
-export function createTextEditor(options?: any): TextEditor {
-  // @ts-ignore
-  return atom.workspace.buildTextEditor(options);
-}
 
 function parseBracketRanges(text: string) {
   let depth = 0;
@@ -38,12 +34,18 @@ function parseBracketRanges(text: string) {
   return ranges;
 }
 
-export function testTextEditor(text: string): TextEditor {
-  const t = createTextEditor();
+export async function testTextEditor(
+  text: string,
+  commands: Command[] = []
+): Promise<TextEditor> {
+  const t = await atom.workspace.open();
   const parsedText = text.replace("[", "").replace("]", "");
   t.setText(parsedText);
   const ranges = parseBracketRanges(text);
   t.setSelectedScreenRanges(ranges);
+  for (const command of commands) {
+    await atom.commands.dispatch((<any>t).element, command);
+  }
   return t;
 }
 
@@ -52,6 +54,7 @@ export function assertEqualTextEditors(actual: TextEditor, expected: string) {
   assert.strictEqual(actual.getText(), parsedText);
   assert.sameDeepMembers(
     actual.getSelectedBufferRanges(),
-    parseBracketRanges(expected)
+    parseBracketRanges(expected),
+    "Editor expected to have ranges"
   );
 }

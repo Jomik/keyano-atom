@@ -4,10 +4,19 @@ import {
   CommandEvent,
   TextEditorElement
 } from "atom";
-import { wordSelector } from "./selectors";
+import { wordSelector, Selector } from "./selectors";
 import { selectNext, selectPrevious } from "./motions";
 
 export let disposables = new CompositeDisposable();
+
+export enum Command {
+  Word = "keyano:set-selector-word",
+  next = "keyano:select-next",
+  prev = "keyano:select-previous"
+}
+
+let editorSelector: WeakMap<TextEditor, Selector> = new WeakMap();
+const defaultSelector = wordSelector;
 
 export function activate() {
   disposables.add(
@@ -15,18 +24,10 @@ export function activate() {
       atom.views.getView(editor).classList.add("keyano");
     }),
     atom.commands.add("atom-text-editor", {
-      "keyano:select-next-word": (_: CommandEvent<TextEditorElement>) => {
-        const editor = atom.workspace.getActiveTextEditor();
-        if (editor !== undefined) {
-          selectNext(editor, wordSelector);
-        }
-      },
-      "keyano:select-previous-word": (_: CommandEvent<TextEditorElement>) => {
-        const editor = atom.workspace.getActiveTextEditor();
-        if (editor !== undefined) {
-          selectPrevious(editor, wordSelector);
-        }
-      }
+      [Command.Word]: setSelector(wordSelector),
+      [Command.next]: withEditorContext(selectNext),
+      [Command.prev]: withEditorContext(selectPrevious),
+      "keyano:toggle": toggleKeyanoBindings
     })
   );
 }
@@ -34,4 +35,34 @@ export function activate() {
 export function deactivate() {
   disposables.dispose();
   disposables = new CompositeDisposable();
+  editorSelector = new WeakMap();
+}
+
+function setSelector(selector: Selector) {
+  return (_: CommandEvent<TextEditorElement>) => {
+    const editor = atom.workspace.getActiveTextEditor();
+    if (editor !== undefined) {
+      editorSelector.set(editor, selector);
+    }
+  };
+}
+
+function withEditorContext(
+  action: (editor: TextEditor, selector: Selector) => Promise<any> | void
+) {
+  return (_: CommandEvent<TextEditorElement>) => {
+    const editor = atom.workspace.getActiveTextEditor();
+    if (editor !== undefined) {
+      const selector = editorSelector.get(editor) || defaultSelector;
+      return action(editor, selector);
+    }
+  };
+}
+
+function toggleKeyanoBindings() {
+  const editor = atom.workspace.getActiveTextEditor();
+  if (editor !== undefined) {
+    // @ts-ignore
+    editor.element.classList.toggle("keyano");
+  }
 }
