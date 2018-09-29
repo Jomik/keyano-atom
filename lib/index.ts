@@ -27,8 +27,15 @@ const defaultSelector = wordSelector;
 
 export function activate() {
   disposables.add(
+    atom.config.observe("keyano.keyboardLayout", setKeymap),
+    atom.config.observe("keyano.enabled", enableKeyano),
+
     atom.workspace.observeTextEditors((editor: TextEditor) => {
-      atom.views.getView(editor).classList.add("keyano");
+      const view = atom.views.getView(editor);
+      if (atom.config.get("keyano.enabled")) {
+        view.classList.add("keyano");
+      }
+      view.classList.add(atom.config.get("keyano.keyboardLayout"));
     }),
     atom.commands.add("atom-text-editor", {
       [Command.Word]: setSelector(wordSelector),
@@ -45,6 +52,50 @@ export function deactivate() {
   disposables.dispose();
   disposables = new CompositeDisposable();
   editorSelector = new WeakMap();
+}
+
+const keymaps = [
+  { value: "keymap-QWERTY", description: "Standard US QWERTY" },
+  { value: "keymap-Colemak", description: "US Colemak" }
+];
+export const config = {
+  enabled: {
+    title: "Enable Keyano Keymap",
+    description: "Enable Keyano Keymap (Meant for debugging)",
+    type: "boolean",
+    default: true
+  },
+  keyboardLayout: {
+    title: "Keyboard Layout",
+    description:
+      "Use one of our predefine keymaps fitting your keyboard layout",
+    type: "string",
+    default: "keymap-QWERTY",
+    enum: keymaps
+  }
+};
+
+function setKeymap(value: string) {
+  const editors = atom.workspace.getTextEditors();
+  for (const e of editors) {
+    const view = atom.views.getView(e);
+    for (const map of keymaps.values()) {
+      view.classList.remove(map.value);
+    }
+    view.classList.add(value);
+  }
+}
+
+function enableKeyano(enable: boolean) {
+  const editors = atom.workspace.getTextEditors();
+  for (const e of editors) {
+    const view = atom.views.getView(e);
+    view.classList.toggle("keyano", enable);
+  }
+}
+
+function toggleKeyanoBindings() {
+  atom.config.set("keyano.enabled", !atom.config.get("keyano.enabled"));
 }
 
 function setSelector(selector: Selector) {
@@ -66,11 +117,4 @@ function withEditorSelector(
       return action(editor, selector);
     }
   };
-}
-
-function toggleKeyanoBindings() {
-  const editor = atom.workspace.getActiveTextEditor();
-  if (editor !== undefined) {
-    atom.views.getView(editor).classList.toggle("keyano");
-  }
 }
