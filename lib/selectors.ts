@@ -197,7 +197,7 @@ export const parenthesesSelector: Selector = {
     const matching = previousMatching(
       buffer,
       first.end.translate([0, -1]),
-      /\(/,
+      /\(/g,
       /\)/
     );
     if (matching === undefined) {

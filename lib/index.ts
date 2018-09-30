@@ -11,6 +11,7 @@ import {
   Selector
 } from "./selectors";
 import * as M from "./motions";
+import * as A from "./actions";
 
 export let disposables = new CompositeDisposable();
 
@@ -22,7 +23,8 @@ export enum Command {
   nextAfter = "keyano:select-next-after",
   prev = "keyano:select-previous",
   prevAfter = "keyano:select-previous-after",
-  allIn = "keyano:select-all-in"
+  allIn = "keyano:select-all-in",
+  delete = "keyano:delete-selections"
 }
 
 let editorSelector: WeakMap<TextEditor, Selector> = new WeakMap();
@@ -49,6 +51,7 @@ export function activate() {
       [Command.prev]: withEditorSelector(M.selectPrevious),
       [Command.prevAfter]: withEditorSelector(M.selectPreviousAfter),
       [Command.allIn]: withEditorSelector(M.selectAllIn),
+      [Command.delete]: withEditorSelector(A.deleteSelections),
       "keyano:toggle": toggleKeyanoBindings
     })
   );
