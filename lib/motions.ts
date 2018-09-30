@@ -1,6 +1,28 @@
 import { TextEditor } from "atom";
 import { Selector } from "./selectors";
 
+export function selectAllIn(editor: TextEditor, selector: Selector) {
+  const buffer = editor.getBuffer();
+  for (const selection of editor.getSelections()) {
+    const selectionRange = selection.getBufferRange();
+    let point = selectionRange.start;
+    let ranges = [];
+    while (selectionRange.containsPoint(point)) {
+      const match = selector.next(point, buffer);
+      if (match === undefined) {
+        break;
+      }
+      point = match.end;
+      if (selectionRange.containsPoint(point)) {
+        ranges.push(match);
+      }
+    }
+    if (ranges.length !== 0) {
+      editor.setSelectedBufferRanges(ranges);
+    }
+  }
+}
+
 export function selectNext(editor: TextEditor, selector: Selector) {
   const buffer = editor.getBuffer();
   for (const selection of editor.getSelections()) {

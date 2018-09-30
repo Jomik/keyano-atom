@@ -21,7 +21,8 @@ export enum Command {
   next = "keyano:select-next",
   nextAfter = "keyano:select-next-after",
   prev = "keyano:select-previous",
-  prevAfter = "keyano:select-previous-after"
+  prevAfter = "keyano:select-previous-after",
+  allIn = "keyano:select-all-in"
 }
 
 let editorSelector: WeakMap<TextEditor, Selector> = new WeakMap();
@@ -47,6 +48,7 @@ export function activate() {
       [Command.nextAfter]: withEditorSelector(M.selectNextAfter),
       [Command.prev]: withEditorSelector(M.selectPrevious),
       [Command.prevAfter]: withEditorSelector(M.selectPreviousAfter),
+      [Command.allIn]: withEditorSelector(M.selectAllIn),
       "keyano:toggle": toggleKeyanoBindings
     })
   );
