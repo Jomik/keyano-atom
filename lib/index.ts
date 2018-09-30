@@ -10,7 +10,7 @@ import {
   parenthesesSelector,
   Selector
 } from "./selectors";
-import { selectNext, selectPrevious } from "./motions";
+import * as M from "./motions";
 
 export let disposables = new CompositeDisposable();
 
@@ -19,7 +19,9 @@ export enum Command {
   Line = "keyano:set-selector-line",
   Parentheses = "keyano:set-selector-parentheses",
   next = "keyano:select-next",
-  prev = "keyano:select-previous"
+  nextAfter = "keyano:select-next-after",
+  prev = "keyano:select-previous",
+  prevAfter = "keyano:select-previous-after"
 }
 
 let editorSelector: WeakMap<TextEditor, Selector> = new WeakMap();
@@ -41,8 +43,10 @@ export function activate() {
       [Command.Word]: setSelector(wordSelector),
       [Command.Line]: setSelector(lineSelector),
       [Command.Parentheses]: setSelector(parenthesesSelector),
-      [Command.next]: withEditorSelector(selectNext),
-      [Command.prev]: withEditorSelector(selectPrevious),
+      [Command.next]: withEditorSelector(M.selectNext),
+      [Command.nextAfter]: withEditorSelector(M.selectNextAfter),
+      [Command.prev]: withEditorSelector(M.selectPrevious),
+      [Command.prevAfter]: withEditorSelector(M.selectPreviousAfter),
       "keyano:toggle": toggleKeyanoBindings
     })
   );

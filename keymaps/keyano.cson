@@ -1,12 +1,16 @@
 "atom-text-editor.keyano.keymap-QWERTY":
   "æ": "keyano:select-next"
+  "ctrl-æ": "keyano:select-next-after"
   "j": "keyano:select-previous"
+  "ctrl-j": "keyano:select-previous-after"
   "w": "keyano:set-selector-word"
   "q": "keyano:set-selector-line"
   "e": "keyano:set-selector-parentheses"
 "atom-text-editor.keyano.keymap-Colemak":
   "o": "keyano:select-next"
+  "ctrl-o": "keyano:select-next-after"
   "n": "keyano:select-previous"
+  "ctrl-n": "keyano:select-previous-after"
   "w": "keyano:set-selector-word"
   "f": "keyano:set-selector-line"
   "p": "keyano:set-selector-parentheses"
