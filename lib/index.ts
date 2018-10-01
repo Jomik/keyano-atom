@@ -25,6 +25,7 @@ export enum Command {
 
 let editorSelector: WeakMap<TextEditor, S.Selector> = new WeakMap();
 const defaultSelector = S.wordSelector;
+const statusbarItem = document.createElement("span");
 
 export function activate() {
   disposables.add(
@@ -58,6 +59,10 @@ export function deactivate() {
   disposables.dispose();
   disposables = new CompositeDisposable();
   editorSelector = new WeakMap();
+}
+
+export function consumeStatusBar(statusbar: any) {
+  statusbar.addLeftTile({ item: statusbarItem, priority: 0 });
 }
 
 const keymaps = [
@@ -109,6 +114,7 @@ function setSelector(selector: S.Selector) {
     const editor = atom.workspace.getActiveTextEditor();
     if (editor !== undefined) {
       editorSelector.set(editor, selector);
+      statusbarItem.innerText = selector.statusbarName;
     }
   };
 }

@@ -1,6 +1,7 @@
 import { Range, TextBuffer, Point } from "atom";
 
 export interface Selector {
+  statusbarName: string;
   matches(range: Range, buffer: TextBuffer): boolean;
   next(from: Point, buffer: TextBuffer): Range | undefined;
   previous(from: Point, buffer: TextBuffer): Range | undefined;
@@ -39,11 +40,13 @@ function previousMatchFrom(
 }
 
 function selectorFromRegExp(
+  statusbarName: string,
   match: RegExp,
   first: RegExp,
   last: RegExp
 ): Selector {
   return {
+    statusbarName,
     matches(range: Range, buffer: TextBuffer) {
       return match.test(buffer.getTextInRange(range));
     },
@@ -68,10 +71,16 @@ function selectorFromRegExp(
   };
 }
 
-export const wordSelector = selectorFromRegExp(/\b(\w|')+\b/, /\W+\w/, /\w\W+/);
-export const charSelector = selectorFromRegExp(/./, /./, /./);
+export const wordSelector = selectorFromRegExp(
+  "Word",
+  /\b(\w|')+\b/,
+  /\W+\w/,
+  /\w\W+/
+);
+export const charSelector = selectorFromRegExp("Char", /./, /./, /./);
 
 export const lineSelector: Selector = {
+  statusbarName: "Line",
   matches(range: Range, buffer: TextBuffer) {
     return (
       range.start.row === range.end.row &&
@@ -114,7 +123,6 @@ function nextMatching(
 ) {
   const end = buffer.getEndPosition();
   const search = orRegExp(left, right);
-  console.log({ search });
   let depth = 0;
   let match: Range | undefined;
   buffer.scanInRange(
@@ -142,7 +150,6 @@ function previousMatching(
   right: RegExp
 ) {
   const search = orRegExp(left, right);
-  console.log({ search });
   let depth = 0;
   let match: Range | undefined;
   buffer.backwardsScanInRange(
@@ -164,6 +171,7 @@ function previousMatching(
 }
 
 export const parenthesesSelector: Selector = {
+  statusbarName: "()",
   matches(range: Range, buffer: TextBuffer) {
     const text = buffer.getTextInRange(range);
     if (text.length < 2 || text[0] !== "(" || text[text.length - 1] !== ")") {
