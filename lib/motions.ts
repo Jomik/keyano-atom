@@ -1,72 +1,66 @@
-import { TextEditor } from "atom";
+import { TextEditor, TextBuffer, Range } from "atom";
 import { Selector } from "./selectors";
 
-export function selectAllIn(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
-  for (const selection of editor.getSelections()) {
-    const selectionRange = selection.getBufferRange();
-    let point = selectionRange.start;
-    let ranges = [];
-    while (selectionRange.containsPoint(point)) {
-      const match = selector.next(point, buffer);
-      if (match === undefined) {
-        break;
-      }
-      point = match.end;
-      if (selectionRange.containsPoint(point)) {
-        ranges.push(match);
-      }
-    }
-    if (ranges.length !== 0) {
-      editor.setSelectedBufferRanges(ranges);
-    }
-  }
+function flatMap<A, B>(fn: (a: A) => B[], arr: A[]) {
+  return arr.reduce<B[]>((acc, x) => acc.concat(fn(x)), []);
 }
 
-export function selectNext(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
-  for (const selection of editor.getSelections()) {
-    const range = selection.getBufferRange();
-    const word = selector.matches(range, buffer)
-      ? selector.next(range.end, buffer)
-      : selector.next(range.start, buffer);
-    if (word !== undefined) {
-      selection.setBufferRange(word);
-    }
-  }
+type MapSelectionsFnArg = {
+  buffer: TextBuffer;
+  selector: Selector;
+  range: Range;
+};
+function mapSelections(
+  fn: (
+    { buffer: TextBuffer, selector: Selector, range: Range }: MapSelectionsFnArg
+  ) => Range[]
+) {
+  return (editor: TextEditor, selector: Selector) => {
+    const buffer = editor.getBuffer();
+    const ranges = editor.getSelectedBufferRanges();
+    const newRanges = flatMap(range => fn({ buffer, selector, range }), ranges);
+    editor.setSelectedBufferRanges(newRanges);
+  };
 }
 
-export function selectNextAfter(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
-  for (const selection of editor.getSelections()) {
-    const range = selection.getBufferRange();
-    const word = selector.next(range.end, buffer);
-    if (word !== undefined) {
-      selection.setBufferRange(word);
+export const selectAllIn = mapSelections(({ buffer, selector, range }) => {
+  let point = range.start;
+  let ranges = [];
+  while (range.containsPoint(point)) {
+    const match = selector.next(point, buffer);
+    if (match === undefined) {
+      break;
+    }
+    point = match.end;
+    if (range.containsPoint(point)) {
+      ranges.push(match);
     }
   }
-}
+  return ranges;
+});
 
-export function selectPrevious(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
-  for (const selection of editor.getSelections()) {
-    const range = selection.getBufferRange();
-    const word = selector.matches(range, buffer)
-      ? selector.previous(range.start, buffer)
-      : selector.previous(range.end, buffer);
-    if (word !== undefined) {
-      selection.setBufferRange(word);
-    }
-  }
-}
+export const selectNext = mapSelections(({ buffer, selector, range }) => {
+  const next = selector.matches(range, buffer)
+    ? selector.next(range.end, buffer)
+    : selector.next(range.start, buffer);
+  return next !== undefined ? [next] : [];
+});
 
-export function selectPreviousAfter(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
-  for (const selection of editor.getSelections()) {
-    const range = selection.getBufferRange();
-    const word = selector.previous(range.start, buffer);
-    if (word !== undefined) {
-      selection.setBufferRange(word);
-    }
+export const selectNextAfter = mapSelections(({ buffer, selector, range }) => {
+  const prev = selector.next(range.end, buffer);
+  return prev !== undefined ? [prev] : [];
+});
+
+export const selectPrevious = mapSelections(({ buffer, selector, range }) => {
+  const prev = selector.matches(range, buffer)
+    ? selector.previous(range.start, buffer)
+    : selector.previous(range.end, buffer);
+  return prev !== undefined ? [prev] : [];
+});
+
+export const selectPreviousAfter = mapSelections(
+  ({ buffer, selector, range }) => {
+    const prev = selector.previous(range.start, buffer);
+    return prev !== undefined ? [prev] : [];
   }
-}
+);

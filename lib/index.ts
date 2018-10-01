@@ -4,12 +4,7 @@ import {
   CommandEvent,
   TextEditorElement
 } from "atom";
-import {
-  wordSelector,
-  lineSelector,
-  parenthesesSelector,
-  Selector
-} from "./selectors";
+import * as S from "./selectors";
 import * as M from "./motions";
 import * as A from "./actions";
 
@@ -18,6 +13,7 @@ export let disposables = new CompositeDisposable();
 export enum Command {
   Word = "keyano:set-selector-word",
   Line = "keyano:set-selector-line",
+  Char = "keyano:set-selector-char",
   Parentheses = "keyano:set-selector-parentheses",
   next = "keyano:select-next",
   nextAfter = "keyano:select-next-after",
@@ -27,8 +23,8 @@ export enum Command {
   delete = "keyano:delete-selections"
 }
 
-let editorSelector: WeakMap<TextEditor, Selector> = new WeakMap();
-const defaultSelector = wordSelector;
+let editorSelector: WeakMap<TextEditor, S.Selector> = new WeakMap();
+const defaultSelector = S.wordSelector;
 
 export function activate() {
   disposables.add(
@@ -43,9 +39,10 @@ export function activate() {
       view.classList.add(atom.config.get("keyano.keyboardLayout"));
     }),
     atom.commands.add("atom-text-editor", {
-      [Command.Word]: setSelector(wordSelector),
-      [Command.Line]: setSelector(lineSelector),
-      [Command.Parentheses]: setSelector(parenthesesSelector),
+      [Command.Char]: setSelector(S.charSelector),
+      [Command.Word]: setSelector(S.wordSelector),
+      [Command.Line]: setSelector(S.lineSelector),
+      [Command.Parentheses]: setSelector(S.parenthesesSelector),
       [Command.next]: withEditorSelector(M.selectNext),
       [Command.nextAfter]: withEditorSelector(M.selectNextAfter),
       [Command.prev]: withEditorSelector(M.selectPrevious),
@@ -107,7 +104,7 @@ function toggleKeyanoBindings() {
   atom.config.set("keyano.enabled", !atom.config.get("keyano.enabled"));
 }
 
-function setSelector(selector: Selector) {
+function setSelector(selector: S.Selector) {
   return (_: CommandEvent<TextEditorElement>) => {
     const editor = atom.workspace.getActiveTextEditor();
     if (editor !== undefined) {
@@ -117,7 +114,7 @@ function setSelector(selector: Selector) {
 }
 
 function withEditorSelector(
-  action: (editor: TextEditor, selector: Selector) => Promise<any> | void
+  action: (editor: TextEditor, selector: S.Selector) => Promise<any> | void
 ) {
   return (_: CommandEvent<TextEditorElement>) => {
     const editor = atom.workspace.getActiveTextEditor();

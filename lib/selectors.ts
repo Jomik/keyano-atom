@@ -13,8 +13,9 @@ function nextMatchFrom(
 ): Range | undefined {
   const { end } = buffer.getRange();
   let matchRange;
-  buffer.scanInRange(reg, new Range(from, end), ({ range }) => {
+  buffer.scanInRange(reg, new Range(from, end), ({ range, stop }) => {
     matchRange = range;
+    stop();
   });
   return matchRange;
 }
@@ -26,50 +27,59 @@ function previousMatchFrom(
 ): Range | undefined {
   const { start } = buffer.getRange();
   let matchRange;
-  buffer.backwardsScanInRange(reg, new Range(start, from), ({ range }) => {
-    matchRange = range;
-  });
+  buffer.backwardsScanInRange(
+    reg,
+    new Range(start, from),
+    ({ range, stop }) => {
+      matchRange = range;
+      stop();
+    }
+  );
   return matchRange;
 }
 
-export const wordSelector: Selector = {
-  matches: (range: Range, buffer: TextBuffer) => {
-    const wordRegex = /^\b(\w|')+\b$/i;
-    return wordRegex.test(buffer.getTextInRange(range));
-  },
-  next: (from: Point, buffer: TextBuffer) => {
-    const firstLetterRegExp = /\W/i;
-    const firstLetter = nextMatchFrom(buffer, firstLetterRegExp, from);
-    if (firstLetter === undefined) {
-      return undefined;
+function selectorFromRegExp(
+  match: RegExp,
+  first: RegExp,
+  last: RegExp
+): Selector {
+  return {
+    matches(range: Range, buffer: TextBuffer) {
+      return match.test(buffer.getTextInRange(range));
+    },
+    next(from: Point, buffer: TextBuffer) {
+      const firstLetter = nextMatchFrom(buffer, first, from);
+      if (firstLetter === undefined) {
+        return undefined;
+      }
+      const firstLetterPos = firstLetter.start;
+      const word = nextMatchFrom(buffer, match, firstLetterPos);
+      return word;
+    },
+    previous(from: Point, buffer: TextBuffer) {
+      const wordEnd = previousMatchFrom(buffer, last, from);
+      if (wordEnd === undefined) {
+        return undefined;
+      }
+      const lastLetter = wordEnd.end;
+      const word = previousMatchFrom(buffer, match, lastLetter);
+      return word;
     }
-    const wordRegex = /\b(\w|')+\b/i;
-    const firstLetterPos = firstLetter.end.translate([0, -1]);
-    const word = nextMatchFrom(buffer, wordRegex, firstLetterPos);
-    return word;
-  },
-  previous: (from: Point, buffer: TextBuffer) => {
-    const wordStartRegex = /\W/i;
-    const wordEnd = previousMatchFrom(buffer, wordStartRegex, from);
-    if (wordEnd === undefined) {
-      return undefined;
-    }
-    const wordRegex = /\b(\w|')+\b/i;
-    const lastLetter = wordEnd.end.translate([0, -1]);
-    const word = previousMatchFrom(buffer, wordRegex, lastLetter);
-    return word;
-  }
-};
+  };
+}
+
+export const wordSelector = selectorFromRegExp(/\b(\w|')+\b/, /\W+\w/, /\w\W+/);
+export const charSelector = selectorFromRegExp(/./, /./, /./);
 
 export const lineSelector: Selector = {
-  matches: (range: Range, buffer: TextBuffer) => {
+  matches(range: Range, buffer: TextBuffer) {
     return (
       range.start.row === range.end.row &&
       range.start.column === 0 &&
       range.end.column === buffer.lineLengthForRow(range.start.row)
     );
   },
-  next: (from: Point, buffer: TextBuffer) => {
+  next(from: Point, buffer: TextBuffer) {
     const row = from.row + 1;
     if (row > buffer.getLastRow()) {
       return;
@@ -77,7 +87,7 @@ export const lineSelector: Selector = {
     const length = buffer.lineLengthForRow(row);
     return new Range([row, 0], [row, length]);
   },
-  previous: (from: Point, buffer: TextBuffer) => {
+  previous(from: Point, buffer: TextBuffer) {
     const row = from.row - 1;
     if (row < 0) {
       return;
@@ -154,7 +164,7 @@ function previousMatching(
 }
 
 export const parenthesesSelector: Selector = {
-  matches: (range: Range, buffer: TextBuffer) => {
+  matches(range: Range, buffer: TextBuffer) {
     const text = buffer.getTextInRange(range);
     if (text.length < 2 || text[0] !== "(" || text[text.length - 1] !== ")") {
       return false;
@@ -173,7 +183,7 @@ export const parenthesesSelector: Selector = {
     }
     return depth === 0;
   },
-  next: (from: Point, buffer: TextBuffer) => {
+  next(from: Point, buffer: TextBuffer) {
     const first = nextMatchFrom(buffer, /\(/, from);
     if (first === undefined) {
       return;
@@ -189,7 +199,7 @@ export const parenthesesSelector: Selector = {
     }
     return new Range(first.start, matching.end);
   },
-  previous: (from: Point, buffer: TextBuffer) => {
+  previous(from: Point, buffer: TextBuffer) {
     const first = previousMatchFrom(buffer, /\)/, from);
     if (first === undefined) {
       return;
