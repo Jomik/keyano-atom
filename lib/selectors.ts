@@ -14,8 +14,17 @@ function nextMatchFrom(
 ): Range | undefined {
   const { end } = buffer.getRange();
   let matchRange;
-  buffer.scanInRange(reg, new Range(from, end), ({ range, stop }) => {
-    matchRange = range;
+  buffer.scanInRange(reg, new Range(from, end), ({ range, stop, match }) => {
+    if (match[1]) {
+      const r = match[0].indexOf(match[1]);
+      const e = match[0].length - match[1].length - r;
+      matchRange = new Range(
+        range.start.translate([0, r]),
+        range.end.translate([0, -e])
+      );
+    } else {
+      matchRange = range;
+    }
     stop();
   });
   return matchRange;
@@ -31,8 +40,17 @@ function previousMatchFrom(
   buffer.backwardsScanInRange(
     reg,
     new Range(start, from),
-    ({ range, stop }) => {
-      matchRange = range;
+    ({ range, stop, match }) => {
+      if (match[1]) {
+        const r = match[0].indexOf(match[1]);
+        const e = match[0].length - match[1].length - r;
+        matchRange = new Range(
+          range.start.translate([0, r]),
+          range.end.translate([0, -e])
+        );
+      } else {
+        matchRange = range;
+      }
       stop();
     }
   );
@@ -73,38 +91,17 @@ function selectorFromRegExp(
 
 export const wordSelector = selectorFromRegExp(
   "Word",
-  /\b(\w|')+\b/,
+  /\b(\w+|'+)\b/,
   /\W+\w/,
   /\w\W+/
 );
 export const charSelector = selectorFromRegExp("Char", /./, /./, /./);
-
-export const lineSelector: Selector = {
-  statusbarName: "Line",
-  matches(range: Range, buffer: TextBuffer) {
-    return (
-      range.start.row === range.end.row &&
-      range.start.column === 0 &&
-      range.end.column === buffer.lineLengthForRow(range.start.row)
-    );
-  },
-  next(from: Point, buffer: TextBuffer) {
-    const row = from.row + 1;
-    if (row > buffer.getLastRow()) {
-      return;
-    }
-    const length = buffer.lineLengthForRow(row);
-    return new Range([row, 0], [row, length]);
-  },
-  previous(from: Point, buffer: TextBuffer) {
-    const row = from.row - 1;
-    if (row < 0) {
-      return;
-    }
-    const length = buffer.lineLengthForRow(row);
-    return new Range([row, 0], [row, length]);
-  }
-};
+export const lineSelector = selectorFromRegExp(
+  "Line",
+  /^[ \t]*(.*)$/m,
+  /^[ \t]*./m,
+  /.$/m
+);
 
 function orRegExp(r1: RegExp, r2: RegExp) {
   const flags = (r1.flags + r2.flags)
