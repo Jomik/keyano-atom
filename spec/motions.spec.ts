@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { testTextEditor, assertEqualTextEditors, packagePath } from "./helpers";
 import { Command as C } from "../lib";
 

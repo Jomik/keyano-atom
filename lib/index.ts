@@ -79,7 +79,7 @@ export const config = {
   keyboardLayout: {
     title: "Keyboard Layout",
     description:
-      "Use one of our predefine keymaps fitting your keyboard layout",
+      "Use one of our predefined keymaps fitting your keyboard layout",
     type: "string",
     default: "keymap-QWERTY",
     enum: keymaps
@@ -90,7 +90,7 @@ function setKeymap(value: string) {
   const editors = atom.workspace.getTextEditors();
   for (const e of editors) {
     const view = atom.views.getView(e);
-    for (const map of keymaps.values()) {
+    for (const map of keymaps) {
       view.classList.remove(map.value);
     }
     view.classList.add(value);
