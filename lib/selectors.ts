@@ -6,6 +6,7 @@ export interface Selector {
   next(from: Point, buffer: TextBuffer): Range | undefined;
   previous(from: Point, buffer: TextBuffer): Range | undefined;
   delete(range: Range, buffer: TextBuffer): Range;
+  expand(range: Range, buffer: TextBuffer): Range | undefined;
 }
 
 function nextMatchFrom(
@@ -89,6 +90,17 @@ function selectorFromRegExp(
     },
     delete(range: Range, buffer: TextBuffer) {
       return range;
+    },
+    expand(range: Range, buffer: TextBuffer) {
+      const firstChar = previousMatchFrom(buffer, first, range.start);
+      if (firstChar === undefined) {
+        return undefined;
+      }
+      const lastChar = nextMatchFrom(buffer, last, range.end);
+      if (lastChar === undefined) {
+        return undefined;
+      }
+      return new Range(firstChar.start, lastChar.end);
     }
   };
 }
@@ -226,5 +238,16 @@ export const parenthesesSelector: Selector = {
   },
   delete(range: Range, _: TextBuffer) {
     return range;
+  },
+  expand(range: Range, buffer: TextBuffer) {
+    const firstChar = previousMatchFrom(buffer, /\(/, range.start);
+    if (firstChar === undefined) {
+      return undefined;
+    }
+    const lastChar = nextMatchFrom(buffer, /\)/, range.end);
+    if (lastChar === undefined) {
+      return undefined;
+    }
+    return new Range(firstChar.start, lastChar.end);
   }
 };

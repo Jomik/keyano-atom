@@ -13,6 +13,7 @@
   "x": "keyano:delete-selections"
   "c": "core:copy"
   "v": "core:paste"
+  "o": "keyano:expand"
   "a": "keyano:set-selector-char"
   "s": "keyano:set-selector-word"
   "d": "keyano:set-selector-line"

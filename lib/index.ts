@@ -23,6 +23,7 @@ export enum Command {
   addPrev = "keyano:add-previous",
   prevAfter = "keyano:select-previous-after",
   addPrevAfter = "keyano:add-previous-after",
+  expand = "keyano:expand",
   allIn = "keyano:select-all-in",
   delete = "keyano:delete-selections"
 }
@@ -56,6 +57,7 @@ export async function activate() {
       [Command.addPrev]: withEditorSelector(M.addPrevious),
       [Command.prevAfter]: withEditorSelector(M.selectPreviousAfter),
       [Command.addPrevAfter]: withEditorSelector(M.addPreviousAfter),
+      [Command.expand]: withEditorSelector(M.selectExpand),
       [Command.allIn]: withEditorSelector(M.selectAllIn),
       [Command.delete]: withEditorSelector(A.deleteSelections),
       "keyano:toggle": toggleKeyanoBindings

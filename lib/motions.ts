@@ -76,6 +76,12 @@ function previousAfter({ buffer, selector, range }: Args) {
   return prev !== undefined ? [prev] : [];
 }
 
+function expand({ buffer, selector, range }: Args) {
+  const exp = selector.expand(range, buffer);
+  return exp !== undefined ? [exp] : [];
+}
+
+export const selectExpand = mapSelections(expand);
 export const selectNext = mapSelections(next);
 export const selectNextAfter = mapSelections(nextAfter);
 export const addNext = mapSelections(add(next));
