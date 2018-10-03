@@ -112,6 +112,12 @@ export const wordSelector = selectorFromRegExp(
   /\w\W+/
 );
 export const charSelector = selectorFromRegExp("Char", /./, /./, /./);
+export const numberSelector = selectorFromRegExp(
+  "Number",
+  /[0-9]+(?:\.[0-9]+)?/,
+  /[0-9]/,
+  /[0-9]/
+);
 export const lineSelector = {
   ...selectorFromRegExp("Line", /^[ \t]*(.*)$/m, /^[ \t]*./m, /.$/m),
   delete(range: Range, buffer: TextBuffer) {

@@ -17,6 +17,7 @@
   "a": "keyano:set-selector-char"
   "s": "keyano:set-selector-word"
   "d": "keyano:set-selector-line"
+  "w": "keyano:set-selector-number"
   "r": "keyano:set-selector-parentheses"
 "atom-text-editor.keyano.keymap-Colemak":
   "o": "keyano:select-next"
@@ -33,9 +34,11 @@
   "x": "keyano:delete-selections"
   "c": "core:copy"
   "v": "core:paste"
+  "y": "keyano:expand"
   "a": "keyano:set-selector-char"
   "r": "keyano:set-selector-word"
   "s": "keyano:set-selector-line"
+  "w": "keyano:set-selector-number"
   "p": "keyano:set-selector-parentheses"
 "atom-text-editor":
   "alt-escape": "keyano:toggle"

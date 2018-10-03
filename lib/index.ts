@@ -11,9 +11,10 @@ import * as A from "./actions";
 export let disposables = new CompositeDisposable();
 
 export enum Command {
+  Char = "keyano:set-selector-char",
   Word = "keyano:set-selector-word",
   Line = "keyano:set-selector-line",
-  Char = "keyano:set-selector-char",
+  Number = "keyano:set-selector-number",
   Parentheses = "keyano:set-selector-parentheses",
   next = "keyano:select-next",
   addNext = "keyano:add-next",
@@ -48,6 +49,7 @@ export async function activate() {
       [Command.Char]: setSelector(S.charSelector),
       [Command.Word]: setSelector(S.wordSelector),
       [Command.Line]: setSelector(S.lineSelector),
+      [Command.Number]: setSelector(S.numberSelector),
       [Command.Parentheses]: setSelector(S.parenthesesSelector),
       [Command.next]: withEditorSelector(M.selectNext),
       [Command.addNext]: withEditorSelector(M.addNext),
