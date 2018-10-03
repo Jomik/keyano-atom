@@ -27,7 +27,7 @@ let editorSelector: WeakMap<TextEditor, S.Selector> = new WeakMap();
 const defaultSelector = S.wordSelector;
 const statusbarItem = document.createElement("span");
 
-export function activate() {
+export async function activate() {
   disposables.add(
     atom.config.observe("keyano.keyboardLayout", setKeymap),
     atom.config.observe("keyano.enabled", enableKeyano),

@@ -5,6 +5,7 @@ export interface Selector {
   matches(range: Range, buffer: TextBuffer): boolean;
   next(from: Point, buffer: TextBuffer): Range | undefined;
   previous(from: Point, buffer: TextBuffer): Range | undefined;
+  delete(range: Range, buffer: TextBuffer): Range;
 }
 
 function nextMatchFrom(
@@ -85,6 +86,9 @@ function selectorFromRegExp(
       const lastLetter = wordEnd.end;
       const word = previousMatchFrom(buffer, match, lastLetter);
       return word;
+    },
+    delete(range: Range, buffer: TextBuffer) {
+      return range;
     }
   };
 }
@@ -96,13 +100,13 @@ export const wordSelector = selectorFromRegExp(
   /\w\W+/
 );
 export const charSelector = selectorFromRegExp("Char", /./, /./, /./);
-export const lineSelector = selectorFromRegExp(
-  "Line",
-  /^[ \t]*(.*)$/m,
-  /^[ \t]*./m,
-  /.$/m
-);
-
+export const lineSelector = {
+  ...selectorFromRegExp("Line", /^[ \t]*(.*)$/m, /^[ \t]*./m, /.$/m),
+  delete(range: Range, buffer: TextBuffer) {
+    const { row } = range.start;
+    return buffer.rangeForRow(row, true);
+  }
+};
 function orRegExp(r1: RegExp, r2: RegExp) {
   const flags = (r1.flags + r2.flags)
     .split("")
@@ -219,5 +223,8 @@ export const parenthesesSelector: Selector = {
       return;
     }
     return new Range(matching.start, first.end);
+  },
+  delete(range: Range, _: TextBuffer) {
+    return range;
   }
 };
