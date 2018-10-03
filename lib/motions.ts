@@ -39,28 +39,48 @@ export const selectAllIn = mapSelections(({ buffer, selector, range }) => {
   return ranges;
 });
 
-export const selectNext = mapSelections(({ buffer, selector, range }) => {
-  const next = selector.matches(range, buffer)
+type Args = {
+  buffer: TextBuffer;
+  selector: Selector;
+  range: Range;
+};
+
+function add(fn: (a: Args) => Range[]) {
+  return (args: Args) => {
+    const { range } = args;
+    return [range, ...fn(args)];
+  };
+}
+
+function next({ buffer, selector, range }: Args) {
+  const nxt = selector.matches(range, buffer)
     ? selector.next(range.end, buffer)
     : selector.next(range.start, buffer);
-  return next !== undefined ? [next] : [];
-});
+  return nxt !== undefined ? [nxt] : [];
+}
 
-export const selectNextAfter = mapSelections(({ buffer, selector, range }) => {
+function nextAfter({ buffer, selector, range }: Args) {
   const prev = selector.next(range.end, buffer);
   return prev !== undefined ? [prev] : [];
-});
+}
 
-export const selectPrevious = mapSelections(({ buffer, selector, range }) => {
+function previous({ buffer, selector, range }: Args) {
   const prev = selector.matches(range, buffer)
     ? selector.previous(range.start, buffer)
     : selector.previous(range.end, buffer);
   return prev !== undefined ? [prev] : [];
-});
+}
 
-export const selectPreviousAfter = mapSelections(
-  ({ buffer, selector, range }) => {
-    const prev = selector.previous(range.start, buffer);
-    return prev !== undefined ? [prev] : [];
-  }
-);
+function previousAfter({ buffer, selector, range }: Args) {
+  const prev = selector.previous(range.start, buffer);
+  return prev !== undefined ? [prev] : [];
+}
+
+export const selectNext = mapSelections(next);
+export const selectNextAfter = mapSelections(nextAfter);
+export const addNext = mapSelections(add(next));
+export const addNextAfter = mapSelections(add(nextAfter));
+export const selectPrevious = mapSelections(previous);
+export const addPrevious = mapSelections(add(previous));
+export const selectPreviousAfter = mapSelections(previousAfter);
+export const addPreviousAfter = mapSelections(add(previousAfter));

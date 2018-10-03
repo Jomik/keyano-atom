@@ -16,9 +16,13 @@ export enum Command {
   Char = "keyano:set-selector-char",
   Parentheses = "keyano:set-selector-parentheses",
   next = "keyano:select-next",
+  addNext = "keyano:add-next",
   nextAfter = "keyano:select-next-after",
+  addNextAfter = "keyano:add-next-after",
   prev = "keyano:select-previous",
+  addPrev = "keyano:add-previous",
   prevAfter = "keyano:select-previous-after",
+  addPrevAfter = "keyano:add-previous-after",
   allIn = "keyano:select-all-in",
   delete = "keyano:delete-selections"
 }
@@ -45,9 +49,13 @@ export async function activate() {
       [Command.Line]: setSelector(S.lineSelector),
       [Command.Parentheses]: setSelector(S.parenthesesSelector),
       [Command.next]: withEditorSelector(M.selectNext),
+      [Command.addNext]: withEditorSelector(M.addNext),
       [Command.nextAfter]: withEditorSelector(M.selectNextAfter),
+      [Command.addNextAfter]: withEditorSelector(M.addNextAfter),
       [Command.prev]: withEditorSelector(M.selectPrevious),
+      [Command.addPrev]: withEditorSelector(M.addPrevious),
       [Command.prevAfter]: withEditorSelector(M.selectPreviousAfter),
+      [Command.addPrevAfter]: withEditorSelector(M.addPreviousAfter),
       [Command.allIn]: withEditorSelector(M.selectAllIn),
       [Command.delete]: withEditorSelector(A.deleteSelections),
       "keyano:toggle": toggleKeyanoBindings
