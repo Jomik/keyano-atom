@@ -26,12 +26,14 @@ export enum Command {
   addPrevAfter = "keyano:add-previous-after",
   expand = "keyano:expand",
   allIn = "keyano:select-all-in",
-  delete = "keyano:delete-selections"
+  delete = "keyano:delete-selections",
+  paste = "keyano:paste"
 }
 
 let editorSelector: WeakMap<TextEditor, S.Selector> = new WeakMap();
 const defaultSelector = S.wordSelector;
 const statusbarItem = document.createElement("span");
+statusbarItem.innerText = "Word";
 
 export async function activate() {
   disposables.add(
@@ -62,6 +64,7 @@ export async function activate() {
       [Command.expand]: withEditorSelector(M.selectExpand),
       [Command.allIn]: withEditorSelector(M.selectAllIn),
       [Command.delete]: withEditorSelector(A.deleteSelections),
+      [Command.paste]: withEditorSelector(A.pasteSelections),
       "keyano:toggle": toggleKeyanoBindings
     })
   );

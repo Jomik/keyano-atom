@@ -1,4 +1,4 @@
-import { TextEditor, TextBuffer, Range } from "atom";
+import { TextEditor, TextBuffer, Range, Point } from "atom";
 import { Selector } from "./selectors";
 
 function flatMap<A, B>(fn: (a: A) => B[], arr: A[]) {
@@ -27,7 +27,7 @@ export const selectAllIn = mapSelections(({ buffer, selector, range }) => {
   let point = range.start;
   let ranges = [];
   while (range.containsPoint(point)) {
-    const match = selector.next(point, buffer);
+    const match = nextFrom(buffer, selector, point);
     if (match === undefined) {
       break;
     }
@@ -51,28 +51,59 @@ function add(fn: (a: Args) => Range[]) {
     return [range, ...fn(args)];
   };
 }
+export function nextFrom(
+  buffer: TextBuffer,
+  selector: Selector,
+  from: Point
+): Range | undefined {
+  const left = selector.nextLeft(buffer, from);
+  if (left === undefined) {
+    atom.notifications.addInfo("No left bound found");
+    return undefined;
+  }
+  const right = selector.findMatchingRight(buffer, left);
+  if (right === undefined) {
+    atom.notifications.addInfo("No matching right bound found");
+    return undefined;
+  }
+  return new Range(left.start, right.end);
+}
+
+function previousFrom(buffer: TextBuffer, selector: Selector, from: Point) {
+  const right = selector.prevRight(buffer, from);
+  if (right === undefined) {
+    atom.notifications.addInfo("No right bound found");
+    return undefined;
+  }
+  const left = selector.findMatchingLeft(buffer, right);
+  if (left === undefined) {
+    atom.notifications.addInfo("No matching left bound found");
+    return undefined;
+  }
+  return new Range(left.start, right.end);
+}
 
 function next({ buffer, selector, range }: Args) {
-  const nxt = selector.matches(range, buffer)
-    ? selector.next(range.end, buffer)
-    : selector.next(range.start, buffer);
+  const nxt = selector.matches(buffer, range)
+    ? nextFrom(buffer, selector, range.end)
+    : nextFrom(buffer, selector, range.start);
   return nxt !== undefined ? [nxt] : [];
 }
 
 function nextAfter({ buffer, selector, range }: Args) {
-  const prev = selector.next(range.end, buffer);
-  return prev !== undefined ? [prev] : [];
+  const n = nextFrom(buffer, selector, range.end);
+  return n !== undefined ? [n] : [];
 }
 
 function previous({ buffer, selector, range }: Args) {
-  const prev = selector.matches(range, buffer)
-    ? selector.previous(range.start, buffer)
-    : selector.previous(range.end, buffer);
+  const prev = selector.matches(buffer, range)
+    ? previousFrom(buffer, selector, range.start)
+    : previousFrom(buffer, selector, range.end);
   return prev !== undefined ? [prev] : [];
 }
 
 function previousAfter({ buffer, selector, range }: Args) {
-  const prev = selector.previous(range.start, buffer);
+  const prev = previousFrom(buffer, selector, range.start);
   return prev !== undefined ? [prev] : [];
 }
 
