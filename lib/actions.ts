@@ -17,7 +17,6 @@ export function deleteSelections(editor: TextEditor, selector: Selector) {
 }
 
 export function pasteSelections(editor: TextEditor, selector: Selector) {
-  const buffer = editor.getBuffer();
   saveExcursion(editor, () => {
     for (const s of editor.getSelections()) {
       const range = s.getBufferRange();

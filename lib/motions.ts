@@ -5,14 +5,15 @@ function flatMap<A, B>(fn: (a: A) => B[], arr: A[]) {
   return arr.reduce<B[]>((acc, x) => acc.concat(fn(x)), []);
 }
 
-type MapSelectionsFnArg = {
+type Args = {
   buffer: TextBuffer;
   selector: Selector;
   range: Range;
 };
+
 function mapSelections(
   fn: (
-    { buffer: TextBuffer, selector: Selector, range: Range }: MapSelectionsFnArg
+    { buffer: TextBuffer, selector: Selector, range: Range }: Args
   ) => Range[]
 ) {
   return (editor: TextEditor, selector: Selector) => {
@@ -38,12 +39,6 @@ export const selectAllIn = mapSelections(({ buffer, selector, range }) => {
   }
   return ranges;
 });
-
-type Args = {
-  buffer: TextBuffer;
-  selector: Selector;
-  range: Range;
-};
 
 function add(fn: (a: Args) => Range[]) {
   return (args: Args) => {
@@ -107,10 +102,35 @@ function previousAfter({ buffer, selector, range }: Args) {
   return prev !== undefined ? [prev] : [];
 }
 
-function expand({ buffer, selector, range }: Args) {
-  const exp = selector.expand(range, buffer);
-  return exp !== undefined ? [exp] : [];
+function middlePoint(range: Range): Point {
+  const row = Math.floor((range.start.row + range.end.row) / 2);
+  const column = Math.floor((range.start.column + range.end.column) / 2);
+  return new Point(row, column);
 }
+
+function expand({ buffer, selector, range }: Args) {
+  const right = selector.nextRight(buffer, middlePoint(range));
+  if (right === undefined) {
+    return;
+  }
+  const left = selector.findMatchingLeft(buffer, right);
+  if (left === undefined) {
+    return;
+  }
+  return new Range(left.start, right.end);
+}
+
+export const up = mapSelections(({ range, ...rest }: Args) => {
+  const above = range.translate([-1, 0]);
+  const e = expand({ ...rest, range: above });
+  return e !== undefined ? [e] : [];
+});
+
+export const down = mapSelections(({ range, ...rest }: Args) => {
+  const below = range.translate([1, 0]);
+  const e = expand({ ...rest, range: below });
+  return e !== undefined ? [e] : [];
+});
 
 export const selectExpand = mapSelections(expand);
 export const selectNext = mapSelections(next);
